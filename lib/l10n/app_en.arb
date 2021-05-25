@@ -1,0 +1,56 @@
+{
+    "helloWorld": "Hello World!",
+    "@helloWorld": {
+      "description": "The conventional newborn programmer greeting"
+    },
+
+    "goToConfigurationsToAddImages": "Go to configurations to add images",
+    "@goToConfigurationsToAddImages": {
+      "description": "Navigation information for configuration"
+    },
+
+    "tap3TimesToGoToConfigurationScreen": "Tap 3 times to go on configuration screen",
+    "@tap3TimesToGoToConfigurationScreen": {
+      "description": "Navigation process for configuration screen"
+    },
+
+    "areYouSureBecauseThisWillDeleteAllTheImagesAssociated": "Are you sure because this will delete all the images associated to this icon?",
+    "@areYouSureBecauseThisWillDeleteAllTheImagesAssociated": {
+      "description": "Confirmation message before deleting icon"
+    },
+
+    "doYouWantToDeleteThisIcon": "Do you want to delete this Icon?",
+    "@doYouWantToDeleteThisIcon": {
+      "description": "Confirmation message before deleting icon"
+    },
+
+    "doYouWantToDeleteThisImage": "Do you want to delete this image?",
+    "@doYouWantToDeleteThisImage": {
+      "description": "Confirmation message before deleting image"
+    },
+
+    "tapAgainToRecordANewAudio": "Tap again to record a new audio, current audio will be missed",
+    "@tapAgainToRecordANewAudio": {
+      "description": "Confirmation message before deleting image"
+    },
+
+    "tapToStopRecording": "Tap to stop recording, else it will stop at 30 seconds itself",
+    "@tapToStopRecording": {
+      "description": "Confirmation message before deleting image"
+    },
+
+    "tapRecordingButtonToStartRecording": "Tap recording button to start recording",
+    "@tapRecordingButtonToStartRecording": {
+      "description": "Confirmation message before deleting image"
+    },
+
+    "audioRecorded": "Audio Recorded",
+    "@audioRecorded": {
+      "description": "Audio Recorded"
+    },
+
+    "noImagesExistInThisGroup": "No Images exist in this Group",
+    "@noImagesExistInThisGroup": {
+      "description": "Audio Recorded"
+    }
+}
