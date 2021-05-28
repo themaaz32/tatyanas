@@ -29,8 +29,10 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
   Future startRecording() async {
     final documentDirectory = await getApplicationDocumentsDirectory();
-    final fullPath = "${documentDirectory.path}/${DateTime.now().toString().replaceAll(RegExp(r'(?:_|[^\w\s]| )+'), '')}.m4a";
-    recordedFilePath = fullPath;
+    final fileName = "${DateTime.now().toString().replaceAll(RegExp(r'(?:_|[^\w\s]| )+'), '')}.m4a";
+    final fullPath = "${documentDirectory.path}/$fileName";
+    // recordedFilePath = fullPath;
+    recordedFilePath = fileName;
     print(fullPath);
     await _recordingService.record(fullFilePath: fullPath);
     setState(() {

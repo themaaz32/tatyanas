@@ -280,21 +280,21 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  Future<String> savedPickedImageInDocumentDirectory(String filePath) async {
-    final documentDirectory = await getApplicationDocumentsDirectory();
-    File _pickedFile = File(filePath);
-    File _savedFile = await _pickedFile.copy(
-        "${documentDirectory.path}/${DateTime.now().toString().replaceAll(RegExp(r'(?:_|[^\w\s]| )+'), '')}.jpg");
-    return _savedFile.path;
+  Future<Directory> getApplicationStoragePath()async{
+    return await getApplicationDocumentsDirectory();
+
   }
 
-  Future<String> savedRecordedAudioInDocumentDirectory(String filePath) async {
-    final documentDirectory = await getApplicationDocumentsDirectory();
-    File _recordedAudio = File(filePath);
-    File _savedFile = await _recordedAudio.copy(
-        "${documentDirectory.path}/${DateTime.now().toString().replaceAll(RegExp(r'(?:_|[^\w\s]| )+'), '')}.mp3");
-    return _savedFile.path;
+
+  Future<String> savedPickedImageInDocumentDirectory(String filePath) async {
+    final documentDirectory = await getApplicationStoragePath();
+    File _pickedFile = File(filePath);
+    final String fileName = "${DateTime.now().toString().replaceAll(RegExp(r'(?:_|[^\w\s]| )+'), '')}.jpg";
+    File _savedFile = await _pickedFile.copy(
+        "${documentDirectory.path}/$fileName");
+    return fileName;
   }
+
 
   Future<ImageSourceSelection> showPickImageDialog() async {
     return await showModalBottomSheet<ImageSourceSelection>(

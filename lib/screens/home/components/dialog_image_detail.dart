@@ -9,8 +9,9 @@ import '../../../model/icon_model.dart';
 
 class ImageDetailDialog extends StatelessWidget {
   final ImageModel _image;
+  final Directory appDirectory;
 
-  ImageDetailDialog(this._image);
+  ImageDetailDialog(this._image, this.appDirectory);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +31,7 @@ class ImageDetailDialog extends StatelessWidget {
                   _image.imageLink,
                 )
                     : Image.file(
-              File(_image.imageLink),
+              File("${appDirectory.path}/${_image.imageLink}"),
       fit: BoxFit.cover,
     ),
               ),

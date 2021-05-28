@@ -91,7 +91,7 @@ Widget _getAddNewImageItem(BuildContext context) {
   );
 }
 
-Widget _getEditableImageItem(BuildContext context, ImageModel image) {
+Widget _getEditableImageItem(BuildContext context, ImageModel image, Directory appDirectory) {
   final state = Provider.of<ConfigState>(context, listen: true);
 
   return Stack(
@@ -108,7 +108,7 @@ Widget _getEditableImageItem(BuildContext context, ImageModel image) {
                   image.imageLink,
                 )
               : Image.file(
-                  File(image.imageLink),
+            File("${appDirectory.path}/${image.imageLink}",),
                   fit: BoxFit.cover,
                 ),
           borderRadius: BorderRadius.circular(12),
@@ -145,32 +145,35 @@ Widget _getEditableImagesGrid(BuildContext context) {
 
   return Expanded(
     child: Container(
-      child: GridView.count(
-        padding: const EdgeInsets.all(16),
-        crossAxisCount: 3,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        childAspectRatio: 1,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        children: ([
-          ...(appState.imageGroups.isEmpty
-              ? []
-              : appState.imageGroups[state.currentActiveGroup].images),
-          ...[null]
-        ]).map(
-          (image) {
-            return image == null
-                ? _getAddNewImageItem(context)
-                : _getEditableImageItem(context, image);
-          },
-        ).toList(),
+      child: FutureBuilder(
+        future: appState.getApplicationStoragePath(),
+        builder: (context, snapshot) => snapshot.hasData  ?  GridView.count(
+          padding: const EdgeInsets.all(16),
+          crossAxisCount: 3,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          childAspectRatio: 1,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          children: ([
+            ...(appState.imageGroups.isEmpty
+                ? []
+                : appState.imageGroups[state.currentActiveGroup].images),
+            ...[null]
+          ]).map(
+            (image) {
+              return image == null
+                  ? _getAddNewImageItem(context)
+                  : _getEditableImageItem(context, image, snapshot.data);
+            },
+          ).toList(),
+        ) : const SizedBox(),
       ),
     ),
   );
 }
 
-Widget _getEditableIcon(BuildContext context) {
+Widget _getEditableIcon(BuildContext context,) {
   final appState = Provider.of<AppState>(context, listen: true);
   return AspectRatio(
     aspectRatio: 1,
@@ -204,7 +207,7 @@ Widget _getEditableIcon(BuildContext context) {
   );
 }
 
-Widget _getAddNewIcon(BuildContext context, int index) {
+Widget _getAddNewIcon(BuildContext context, int index,  Directory appDirectory) {
   final state = Provider.of<ConfigState>(context, listen: true);
   final appState = Provider.of<AppState>(context, listen: true);
 
@@ -238,7 +241,7 @@ Widget _getAddNewIcon(BuildContext context, int index) {
                       _currentIcon.iconLink,
                     )
                   : Image.file(
-                      File(_currentIcon.iconLink),
+                      File("${appDirectory.path}/${_currentIcon.iconLink}"),
                       fit: BoxFit.cover,
                     ),
             ),
@@ -275,18 +278,21 @@ Widget _getEditableIconList(BuildContext context) {
 
   return Container(
     height: appState.appSize.height * 0.12,
-    child: ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemBuilder: (context, index) {
-        return index == appState.imageGroups.length
-            ? _getEditableIcon(context)
-            : _getAddNewIcon(context, index);
-      },
-      scrollDirection: Axis.horizontal,
-      separatorBuilder: (context, index) => SizedBox(
-        width: 16,
-      ),
-      itemCount: appState.imageGroups.length + 1,
+    child: FutureBuilder(
+      future: appState.getApplicationStoragePath(),
+      builder: (context, snapshot) => snapshot.hasData ?  ListView.separated(
+        padding: const EdgeInsets.all(16),
+        itemBuilder: (context, index) {
+          return index == appState.imageGroups.length
+              ? _getEditableIcon(context, )
+              : _getAddNewIcon(context, index, snapshot.data);
+        },
+        scrollDirection: Axis.horizontal,
+        separatorBuilder: (context, index) => SizedBox(
+          width: 16,
+        ),
+        itemCount: appState.imageGroups.length + 1,
+      ) : const SizedBox(),
     ),
   );
 }

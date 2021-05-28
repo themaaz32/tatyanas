@@ -35,6 +35,7 @@ Widget _getSettingIcon(BuildContext context) {
             child: Icon(Icons.settings),
             onTap: () {
               state.handleConfigurationNavigation();
+
             },
           ),
         ],
@@ -52,6 +53,7 @@ Widget _getImagesGrid(BuildContext context) {
       child: appState.imageGroups.any((element) => element.images.isNotEmpty)
           ? ScrollablePositionedList.separated(
               itemScrollController: state.controller,
+              physics: ClampingScrollPhysics(),
               itemPositionsListener: state.listener,
               itemBuilder: (context, index) {
                 final listOfGroupedImages = appState.imageGroups[index].images;
@@ -70,7 +72,7 @@ Widget _getImagesGrid(BuildContext context) {
   );
 }
 
-Widget _getIconItem(BuildContext context, int index){
+Widget _getIconItem(BuildContext context, int index, Directory appDirectory){
   final appState = Provider.of<AppState>(context, listen: true);
   final state = Provider.of<HomeState>(context, listen: true);
   return AspectRatio(
@@ -84,10 +86,8 @@ Widget _getIconItem(BuildContext context, int index){
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color: index == 0 ? Colors.blue[300] : Colors.blue,
-              width: index == 0
-                  ? 4
-                  : index == state.currentActiveGroup
+              color:  Colors.blue,
+              width:index == state.currentActiveGroup
                   ? 4
                   : 0,
             ),
@@ -98,7 +98,7 @@ Widget _getIconItem(BuildContext context, int index){
             child: !ifSourceIsFile(appState.imageGroups[index].source)
                 ? Image.asset(appState.imageGroups[index].iconLink)
                 : Image.file(
-              File(appState.imageGroups[index].iconLink),
+              File("${appDirectory.path}/${appState.imageGroups[index].iconLink}"),
             ),
           ),
         ),
@@ -112,16 +112,19 @@ Widget _getIconsList(BuildContext context) {
   return Container(
     color: Colors.grey[200],
     height: appState.appSize.height * 0.12,
-    child: ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemBuilder: (context, index) {
-        return _getIconItem(context, index);
-      },
-      scrollDirection: Axis.horizontal,
-      separatorBuilder: (context, index) => SizedBox(
-        width: 16,
-      ),
-      itemCount: appState.imageGroups.length,
+    child: FutureBuilder(
+      future: appState.getApplicationStoragePath(),
+      builder: (context, snapshot) =>  snapshot.hasData ? ListView.separated(
+        padding: const EdgeInsets.all(16),
+        itemBuilder: (context, index) {
+          return _getIconItem(context, index, snapshot.data);
+        },
+        scrollDirection: Axis.horizontal,
+        separatorBuilder: (context, index) => SizedBox(
+          width: 16,
+        ),
+        itemCount: appState.imageGroups.length,
+      ) : const SizedBox(),
     ),
   );
 }

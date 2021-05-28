@@ -40,30 +40,60 @@ class HomeState extends ChangeNotifier {
   printTest() {
     listener.itemPositions.value.forEach((element) {
       print(
-          "${element.index} leading : ${element.itemLeadingEdge} | trailing : ${element.itemTrailingEdge} Diff = ${(element.itemTrailingEdge > 1 ? 1 : element.itemTrailingEdge)  - (element.itemLeadingEdge < 0 ? 0 : element.itemLeadingEdge)}");
+          "${element.index} leading : ${element.itemLeadingEdge} | trailing : ${element.itemTrailingEdge} Diff = ${(element.itemTrailingEdge > 1 ? 1 : element.itemTrailingEdge) - (element.itemLeadingEdge < 0 ? 0 : element.itemLeadingEdge)}");
     });
   }
 
-  double getAreaOfGroup(ItemPosition element){
-    return (element.itemTrailingEdge > 1 ? 1 : element.itemTrailingEdge)  - (element.itemLeadingEdge < 0 ? 0 : element.itemLeadingEdge);
+  double getAreaOfGroup(ItemPosition element) {
+    return (element.itemTrailingEdge > 1 ? 1 : element.itemTrailingEdge) -
+        (element.itemLeadingEdge < 0 ? 0 : element.itemLeadingEdge);
   }
 
   void attachScrollListener() {
     listener.itemPositions.addListener(() {
-     /* visibleIndexes =
-          listener.itemPositions.value.map((e) => e.index).toList();
-      currentActiveGroup = visibleIndexes.isEmpty ? -1 : visibleIndexes.first;*/
-
-
-      final List<ItemPosition> listOfItems = listener.itemPositions.value.toList();
-      listOfItems.sort((a, b) => getAreaOfGroup(b).compareTo(getAreaOfGroup(a)));
+      final List<ItemPosition> listOfItems =
+          listener.itemPositions.value.toList();
+      listOfItems
+          .sort((a, b) => getAreaOfGroup(b).compareTo(getAreaOfGroup(a)));
 
       final int maxAreaGroupIndex = listOfItems.first.index;
-      // print(maxAreaGroupIndex);
+
       currentActiveGroup = maxAreaGroupIndex;
 
       notifyListeners();
     });
+  }
+
+  bool ifGroupOverFlow(int groupNumber) {
+    final List<ItemPosition> listOfItems =
+        listener.itemPositions.value.toList();
+
+    print(listOfItems);
+    print("$groupNumber item");
+
+    final isGroupOnScreen = listOfItems.firstWhere(
+            (element) => element.index == groupNumber,
+            orElse: () => null) !=
+        null;
+
+    if (isGroupOnScreen) {
+      ///It can be at top
+      ///it can be at bottom
+      ///it can be at mid
+      final index =
+          listOfItems.indexWhere((element) => element.index == groupNumber);
+
+      if (index == 0) {
+        return listOfItems.first.itemLeadingEdge < 0;
+      } else if (index == listOfItems.length - 1) {
+        return listOfItems.last.itemTrailingEdge > 1;
+      } else {
+        return false;
+      }
+    } else {
+      print("group not on screen");
+      return true;
+    }
   }
 
   Future initialize() async {
@@ -109,44 +139,46 @@ class HomeState extends ChangeNotifier {
     }
   }
 
-  bool isGroupEmpty(int index){
+  bool isGroupEmpty(int index) {
     final appState = Provider.of<AppState>(_context, listen: false);
     return appState.imageGroups[index].images.isEmpty;
   }
 
   void handleIconTap(int index) {
     // currentActiveGroup = index;
-    if(isGroupEmpty(index)){
+    if (isGroupEmpty(index)) {
       ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
-          content: Text(AppLocalizations.of(_context)
-              .noImagesExistInThisGroup)));
+          content:
+              Text(AppLocalizations.of(_context).noImagesExistInThisGroup)));
       return;
     }
 
-
-    controller.scrollTo(
-      index: index,
-      duration: Duration(milliseconds: 300),
-    );
-
-    // notifyListeners();
+    if (ifGroupOverFlow(index)) {
+      controller.scrollTo(
+        index: index,
+        duration: Duration(milliseconds: 300),
+      );
+    }
+    //currentActiveGroup = index;
+    notifyListeners();
   }
 
-  Future handleStartPlayAudio(String audioPath) async {
-    await _soundPlayerService.playAudio(audioPath);
+  Future handleStartPlayAudio(String audioPath, Directory appDirectory) async {
+    await _soundPlayerService.playAudio("${appDirectory.path}/$audioPath");
   }
 
   Future handleStopAudio() async {
-    Key k;
     await _soundPlayerService.stopAudio();
   }
 
-  Future handleOpenImageAndPlayAudio(ImageModel image) async {
-    handleStartPlayAudio(image.audioLink);
+  Future handleOpenImageAndPlayAudio(
+      ImageModel image, Directory appDirectory) async {
+    handleStartPlayAudio(image.audioLink, appDirectory);
+
     await showDialog(
       barrierDismissible: false,
       context: _context,
-      builder: (context) => ImageDetailDialog(image),
+      builder: (context) => ImageDetailDialog(image, appDirectory),
     );
     handleStopAudio();
   }
